@@ -4,7 +4,7 @@ Setup:
 ```
 git clone https://github.com/miki164/bookshelf.git
 cd bookshelf
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 Add `secret.json`:
