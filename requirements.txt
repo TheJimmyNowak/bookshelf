@@ -1,5 +1,6 @@
 attrs==21.2.0
 click==8.0.1
+dnspython==2.1.0
 Flask==2.0.1
 Flask-PyMongo==2.3.0
 flask-pytest==0.0.5
