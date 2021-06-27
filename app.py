@@ -2,6 +2,7 @@ from flask import Flask
 from flask_pymongo import PyMongo
 import json
 
+
 secret = open('secret.json')
 secret = json.load(secret)
 
