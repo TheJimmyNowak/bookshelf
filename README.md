@@ -8,8 +8,8 @@ pip install requirements.txt
 ```
 
 Add `secret.json`:
-`
+```
 {
   "connection-string": insert here string to connect with DB
 }
-`
+```
