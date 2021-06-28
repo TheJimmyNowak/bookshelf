@@ -1,3 +1,4 @@
+astroid==2.5.6
 attrs==21.2.0
 click==8.0.1
 dnspython==2.1.0
@@ -5,14 +6,19 @@ Flask==2.0.1
 Flask-PyMongo==2.3.0
 flask-pytest==0.0.5
 iniconfig==1.1.1
+isort==5.9.1
 itsdangerous==2.0.1
 Jinja2==3.0.1
+lazy-object-proxy==1.6.0
 MarkupSafe==2.0.1
+mccabe==0.6.1
 packaging==20.9
 pluggy==0.13.1
 py==1.10.0
+pylint==2.8.3
 pymongo==3.11.4
 pyparsing==2.4.7
 pytest==6.2.4
 toml==0.10.2
 Werkzeug==2.0.1
+wrapt==1.12.1

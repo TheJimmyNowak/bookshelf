@@ -1,8 +1,8 @@
 import json
 
 from flask import Blueprint, jsonify, Response
-from ..models import mongo
-from ..util.JSONEncoder import JSONEncoder
+from api.models import mongo
+from api.util.JSONEncoder import JSONEncoder
 
 book = Blueprint('book', __name__)
 
