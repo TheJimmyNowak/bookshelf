@@ -21,10 +21,14 @@ def get_book(book_id: str) -> Response:
 def add_book() -> Response:
     content = request.json
 
-    if len(content['name']) < 0 or len(content['author']) < 0:
+    # That code kinda scares me
+    def are_required_values_passed() -> bool:
+        return not(content is None or not ("name" in content) or not ("author" in content))
+
+    if not are_required_values_passed():
         logger.debug("Endpoint called without proper body")
         return Response(status=400)
 
     mongo.db.books.insert_one(content)
 
-    return Response(status=500)
+    return Response(status=201)
