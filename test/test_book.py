@@ -1,14 +1,14 @@
 import json
+from unittest import TestCase
+from unittest.mock import patch
 
 from app import create_app
-from unittest import TestCase
-from unittest.mock import Mock, patch
 
 
 @patch('api.routes.book.mongo')
 class Test(TestCase):
     def setUp(self) -> None:
-        self.app = create_app('../secret.json').test_client()
+        self.app = create_app(test=True).test_client()
 
     def test_get_book(self, mongo_mock):
         mongo_mock.db.books.find_one.return_value = dict()
@@ -54,12 +54,18 @@ class Test(TestCase):
         content = {
             "name": "TestName"
         }
-        result = self.app.post('/api/book', data=json.dumps(content), content_type='application/json')
+        result = self.app.post('/api/book',
+                               data=json.dumps(content),
+                               content_type='application/json')
+
         self.assertEqual(result.status_code, 400)
 
         content['author'] = "TestAuthor"
         content['condition'] = "Good"
 
-        result = self.app.post('/api/book', data=json.dumps(content), content_type='application/json')
+        result = self.app.post('/api/book',
+                               data=json.dumps(content),
+                               content_type='application/json')
+
         self.assertTrue(mongo_mock)
         self.assertEqual(result.status_code, 201)

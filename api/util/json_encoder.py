@@ -6,4 +6,4 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
             return str(o)
-        return json.JSONEncoder.d
+        return json.JSONEncoder.d  # pylint: disable=no-member
