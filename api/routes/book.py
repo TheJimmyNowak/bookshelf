@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, Response, request
 
 from api.util.json_encoder import JSONEncoder
 from app import mongo
+from api.user import token_required
 
 book = Blueprint('book', __name__)
 
@@ -39,6 +40,7 @@ def get_book_by_localization(longitude: float, latitude: float, max_distance: fl
     return jsonify(result)
 
 
+@token_required()
 @book.route('/api/book', methods=["POST"])
 def add_book() -> Response:
     content = request.json

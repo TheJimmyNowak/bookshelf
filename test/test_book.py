@@ -8,7 +8,7 @@ from app import create_app
 @patch('api.routes.book.mongo')
 class Test(TestCase):
     def setUp(self) -> None:
-        self.app = create_app(test=True).test_client()
+        self.app = create_app(init_db=False).test_client()
 
     def test_get_book(self, mongo_mock):
         mongo_mock.db.books.find_one.return_value = dict()
