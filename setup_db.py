@@ -1,9 +1,9 @@
-import pymongo
 import json
+import pymongo
 
 print("Reading secrets")
-secrets = open("secret.json")
-secrets = json.load(secrets)
+with open("secret.json") as secrets:
+    secrets = json.load(secrets)
 
 print("Connecting with DB")
 client = pymongo.MongoClient(secrets['connection-string'])
