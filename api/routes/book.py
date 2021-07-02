@@ -14,6 +14,7 @@ logger = logging.getLogger()
 def get_book_id(book_id: str) -> Response:
     result = mongo.db.books.find_one({"_id": ObjectId(book_id)})
     result = json.loads(JSONEncoder().encode(result))
+    logger.info("get_book_id called, returning:\n {}".format(result))
     return jsonify(result)
 
 
@@ -37,6 +38,7 @@ def get_book_by_localization(longitude: float, latitude: float, max_distance: fl
 
     result = dumps(result)
     result = json.loads(result)
+    logger.info("get_book_by_localization called, returning:\n {}".format(result))
     return jsonify(result)
 
 
@@ -50,9 +52,7 @@ def add_book() -> Response:
 
     if is_required_data_passed:
         mongo.db.books.insert_one(content)
-        logger.info("%s was added", content)
-
-        logger.info("{} was added".format(content))
+        logger.info("add_book called, {} was added".format(content))
         return Response(status=201)
 
     return Response(status=400)
