@@ -1,14 +1,13 @@
 import json
 import logging
-
-from bson import ObjectId
+from bson.json_util import dumps, ObjectId
 from flask import Blueprint, jsonify, Response, request
-from api.models import mongo
-from api.util.JSONEncoder import JSONEncoder
-from bson.json_util import dumps
+
+from app import mongo
+from api.util.jwt_token import token_required
+from api.util.json_encoder import JSONEncoder
 
 book = Blueprint('book', __name__)
-logger = logging.getLogger("books")
 
 
 @book.route('/api/book/<book_id>', methods=['GET'])
@@ -42,16 +41,17 @@ def get_book_by_localization(longitude: float, latitude: float, max_distance: fl
 
 
 @book.route('/api/book', methods=["POST"])
+@token_required
 def add_book() -> Response:
     content = request.json
 
-    is_required_data_passed: bool = content is not None and "name" in content and "author" in content
+    is_required_data_passed: bool = \
+        content is not None and "name" in content and "author" in content
 
     if is_required_data_passed:
         mongo.db.books.insert_one(content)
-        logging.info("{} was added".format(content))
+        logging.info("%s was added", content)
 
         return Response(status=201)
 
-    logger.debug("Endpoint called without proper body")
     return Response(status=400)

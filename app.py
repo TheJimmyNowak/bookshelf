@@ -1,30 +1,27 @@
 from flask import Flask
-import json
-import os
+from flask_pymongo import PyMongo
+
+import config
+
+mongo = PyMongo()
 
 
-def create_app(secret_path='secret.json'):
-    app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)  # pylint: disable=redefined-outer-name
 
-    from api.routes.book import book
+    app.config.from_object(config)
+
+    from api.routes.book import book  # pylint: disable=import-outside-toplevel,cyclic-import
+    from api.routes.auth import auth  # pylint: disable=import-outside-toplevel
+
     app.register_blueprint(book)
-
-    if not os.path.exists(secret_path):
-        print("Secrets are not setted up")
-        return app
-
-    with open(secret_path) as secret:
-        secret = json.load(secret)
-
-        from api.models import mongo
-
-        app.config["MONGO_URI"] = secret['connection-string']
+    app.register_blueprint(auth)
 
     mongo.init_app(app)
 
     return app
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = create_app()
     app.run()
