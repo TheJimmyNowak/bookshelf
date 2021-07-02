@@ -31,5 +31,4 @@ jobs:
       - name: Run tests with pytest
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
-          JWT_KEY: ${{ secrets.JWT_KEY }}
         run: pytest

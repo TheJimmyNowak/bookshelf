@@ -11,8 +11,9 @@ class Test(TestCase):
     def setUp(self) -> None:
         self.app = create_app().test_client()
 
+    @patch('api.routes.auth.generate_jwt_token', return_value="faddf")
     @patch('api.routes.auth.mongo')
-    def test_login(self, mongo_mock: MagicMock):
+    def test_login(self, mongo_mock: MagicMock, token_generator_mock: MagicMock):
         password_hash = \
             'pbkdf2:sha256:260000$0FAXi0i12F3fLkBY$b29f073f5' \
             '4f637cb55560d8f1729cba79c88ef5ed0fc214b802f1affb3b27db2'
@@ -24,6 +25,8 @@ class Test(TestCase):
             'password': password_hash,
             'public_id': '1ea4d7c6-ab97-41fe-bca4-f144002fbe6a'
         }
+
+
         request_content = {
             "email": "aaa@aaaa.pl",
             "password": "toor"
