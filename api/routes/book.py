@@ -42,7 +42,7 @@ def get_book_by_localization(longitude: float, latitude: float, max_distance: fl
 
 @book.route('/api/book', methods=["POST"])
 @token_required
-def add_book(current_user) -> Response:
+def add_book() -> Response:
     content = request.json
 
     is_required_data_passed: bool = \

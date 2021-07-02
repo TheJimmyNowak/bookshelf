@@ -15,7 +15,7 @@ def generate_jwt_token(public_id: str, jwt_key: str, expiration_time=30):
 
 
 def token_required(func: Callable) -> Callable:
-    from app import mongo, create_app  # pylint: disable=import-outside-toplevel
+    from app import create_app  # pylint: disable=import-outside-toplevel
 
     app = create_app()
 
@@ -30,12 +30,12 @@ def token_required(func: Callable) -> Callable:
 
         try:
             data = jwt.decode(token, app.config['JWT_KEY'], algorithms="HS256")
-            current_user = mongo.db.books.find_one({'public_id': data['public_id']})
+            #TODO: Check if user exists
         except Exception:
             return jsonify({
                 'message': 'Token is invalid !!'
             }), 401
 
-        return func(current_user, *args, **kwargs)
+        return func(*args, **kwargs)
 
     return decorated

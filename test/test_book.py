@@ -49,9 +49,15 @@ class Test(TestCase):
         result = self.test_app.get('/api/book/190.1/42.0/10.0')
         self.assertEqual(result.status_code, 400)
 
-    def test_add_book(self, mongo_mock):
+    @patch('api.util.jwt_token.jwt.decode')
+    def test_add_book(self, mongo_mock, decode_mock):
         public_id = '1ea4d7c6-ab97-41fe-bca4-f144002fbe6a'
         mongo_mock.db.books.find_one({'public_id': public_id})
+        decoded_token = {
+            'public_id': public_id,
+            'exp': 1625231310
+        }
+        decode_mock.return_value = decoded_token
         result = self.test_app.post('/api/book')
 
         self.assertEqual(result.status_code, 401)
@@ -59,8 +65,7 @@ class Test(TestCase):
         content = {
             "name": "TestName"
         }
-        token = generate_jwt_token(public_id, self.app.config['JWT_KEY'])
-        print(token)
+        token = generate_jwt_token(public_id, "sfafd")
         result = self.test_app.post('/api/book',
                                     data=json.dumps(content),
                                     content_type='application/json',
