@@ -31,7 +31,7 @@ jobs:
       - name: Store secrets
         run: |
           echo ${{ secrets.MONGO_URI }}
-          echo "MONGO_URI=${{ secrets.MONGO_URI }}
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}"
       - name: Run tests with pytest
         run: pytest 
 
