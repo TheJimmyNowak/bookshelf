@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_pymongo import PyMongo
+import logging
 
 import config
 
@@ -18,6 +19,8 @@ def create_app():
     app.register_blueprint(auth)
 
     mongo.init_app(app)
+
+    logging.basicConfig(level=logging.DEBUG)
 
     return app
 
