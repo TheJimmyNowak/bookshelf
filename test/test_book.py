@@ -59,8 +59,8 @@ class Test(TestCase):
         content = {
             "name": "TestName"
         }
-        print(self.app.config['JWT_KEY'])
         token = generate_jwt_token(public_id, self.app.config['JWT_KEY'])
+        print(token)
         result = self.test_app.post('/api/book',
                                     data=json.dumps(content),
                                     content_type='application/json',
