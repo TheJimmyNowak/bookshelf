@@ -2,13 +2,14 @@ import json
 from unittest import TestCase
 from unittest.mock import patch
 
+from api.util.jwt_token import generate_jwt_token
 from app import create_app
 
 
 @patch('api.routes.book.mongo')
 class Test(TestCase):
     def setUp(self) -> None:
-        self.app = create_app(init_db=False).test_client()
+        self.app = create_app().test_client()
 
     def test_get_book(self, mongo_mock):
         mongo_mock.db.books.find_one.return_value = dict()
@@ -48,15 +49,22 @@ class Test(TestCase):
         self.assertEqual(result.status_code, 400)
 
     def test_add_book(self, mongo_mock):
+        public_id = '1ea4d7c6-ab97-41fe-bca4-f144002fbe6a'
+        mongo_mock.db.books.find_one({'public_id': public_id})
         result = self.app.post('/api/book')
-        self.assertEqual(result.status_code, 400)
+
+        self.assertEqual(result.status_code, 401)
 
         content = {
             "name": "TestName"
         }
+        token = generate_jwt_token(public_id, 'SECRET')
         result = self.app.post('/api/book',
                                data=json.dumps(content),
-                               content_type='application/json')
+                               content_type='application/json',
+                               headers={
+                                   'X-Access-Token': token}
+                               )
 
         self.assertEqual(result.status_code, 400)
 
@@ -65,7 +73,8 @@ class Test(TestCase):
 
         result = self.app.post('/api/book',
                                data=json.dumps(content),
-                               content_type='application/json')
+                               content_type='application/json',
+                               headers={'X-Access-Token': token})
 
         self.assertTrue(mongo_mock)
         self.assertEqual(result.status_code, 201)
