@@ -1,4 +1,5 @@
 import json
+import os
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -58,7 +59,7 @@ class Test(TestCase):
         content = {
             "name": "TestName"
         }
-        token = generate_jwt_token(public_id, 'SECRET')
+        token = generate_jwt_token(public_id, os.environ['SECRET_KEY'])
         result = self.app.post('/api/book',
                                data=json.dumps(content),
                                content_type='application/json',
