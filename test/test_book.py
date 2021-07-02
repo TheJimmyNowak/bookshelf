@@ -59,12 +59,12 @@ class Test(TestCase):
         content = {
             "name": "TestName"
         }
-        token = generate_jwt_token(public_id, self.app.config['SECRET_KEY'])
+        token = generate_jwt_token(public_id, self.app.config['JWT_KEY'])
         result = self.test_app.post('/api/book',
                                     data=json.dumps(content),
                                     content_type='application/json',
                                     headers={
-                                   'X-Access-Token': token}
+                                        'X-Access-Token': token}
                                     )
 
         self.assertEqual(result.status_code, 400)

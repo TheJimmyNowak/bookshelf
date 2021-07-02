@@ -40,7 +40,7 @@ def login():
             {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
         )
 
-    token = generate_jwt_token(user['public_id'], app.config['SECRET_KEY'])
+    token = generate_jwt_token(user['public_id'], app.config['JWT_KEY'])
     return make_response(jsonify({'token': token}), 201)
 
 
