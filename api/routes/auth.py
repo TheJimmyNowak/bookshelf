@@ -52,8 +52,9 @@ def register():
     password = data.get('password')
 
     # checking for existing user
-    user = mongo.db.users.find_one({'email': data.get('email')})
-    if user:
+    user_by_email = mongo.db.users.find_one({'email': data.get('email')})
+    user_by_name = mongo.db.users.find_one({'name': data.get('name')})
+    if user_by_email or user_by_name:
         return make_response('User already exists. Please Log in.', 202)
 
     user = {
