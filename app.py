@@ -1,9 +1,13 @@
 from flask import Flask
 from flask_pymongo import PyMongo
+import logging
 
 import config
 
+import os
+
 mongo = PyMongo()
+logger = None #to logging.getLogger() logging should be configed (variable setup in create_app()
 
 
 def create_app():
@@ -18,6 +22,11 @@ def create_app():
     app.register_blueprint(auth)
 
     mongo.init_app(app)
+
+    logging.basicConfig(level=logging.DEBUG)
+    global logger
+    logger = logging.getLogger()
+    logger.info("App has been created")
 
     return app
 
