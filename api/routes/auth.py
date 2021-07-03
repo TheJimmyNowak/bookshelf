@@ -11,7 +11,7 @@ import logging
 auth = Blueprint('auth', __name__)
 app = create_app()
 
-logger = logging.getLogger()
+LOGGER = logging.getLogger()
 
 
 @auth.route('/api/login', methods=['POST'])
@@ -22,7 +22,7 @@ def login():
         not (not auth_data or not auth_data.get('email') or not auth_data.get('password'))
 
     if not are_required_data_passed:
-        logger.info("couldn't verify required data")
+        LOGGER.info("couldn't verify required data")
         return make_response(
             'Could not verify',
             401,
@@ -32,7 +32,7 @@ def login():
     user = mongo.db.users.find_one({'email': auth_data.get('email')})
 
     if not user:
-        logger.info("wrong login")
+        LOGGER.info("wrong login")
         return make_response(
             'Could not verify',
             401,
@@ -40,14 +40,14 @@ def login():
         )
 
     if not check_password_hash(user['password'], auth_data.get('password')):
-        logger.info("wrong password")
+        LOGGER.info("wrong password")
         return make_response(
             'Could not verify',
             403,
             {'WWW-Authenticate': 'Basic realm ="Wrong Password !!"'}
         )
 
-    logger.info("Login data verified, making response with token")
+    LOGGER.info("Login data verified, making response with token")
     token = generate_jwt_token(user['public_id'], app.config['JWT_KEY'])
     return make_response(jsonify({'token': token}), 201)
 
@@ -63,7 +63,7 @@ def register():
     user_by_email = mongo.db.users.find_one({'email': data.get('email')})
     user_by_name = mongo.db.users.find_one({'name': data.get('name')})
     if user_by_email or user_by_name:
-        logger.info("User already exists. Please Log in.")
+        LOGGER.info("User already exists. Please Log in.")
         return make_response('User already exists. Please Log in.', 202)
 
     user = {
@@ -74,5 +74,5 @@ def register():
     }
 
     mongo.db.users.insert_one(user)
-    logger.info("Successfully registered")
+    LOGGER.info("Successfully registered")
     return make_response('Successfully registered.', 201)
