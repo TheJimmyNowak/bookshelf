@@ -3,6 +3,7 @@ attrs==21.2.0
 click==8.0.1
 dnspython==2.1.0
 Flask==2.0.1
+Flask-Cors==3.0.10
 Flask-PyMongo==2.3.0
 flask-pytest==0.0.5
 iniconfig==1.1.1
@@ -15,12 +16,12 @@ mccabe==0.6.1
 packaging==20.9
 pluggy==0.13.1
 py==1.10.0
+PyJWT==2.1.0
 pylint==2.8.3
 pymongo==3.11.4
 pyparsing==2.4.7
 pytest==6.2.4
+six==1.16.0
 toml==0.10.2
 Werkzeug==2.0.1
 wrapt==1.12.1
-
-PyJWT~=2.1.0

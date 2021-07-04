@@ -1,14 +1,16 @@
 import logging
 from flask import Flask
+from flask_cors import CORS
 from flask_pymongo import PyMongo
+
 import config
 
 mongo = PyMongo()
-LOGGER = None  # to logging.getLogger() logging should be configed (variable setup in create_app()
 
 
 def create_app():
     app = Flask(__name__)  # pylint: disable=redefined-outer-name
+    CORS(app)
 
     app.config.from_object(config)
 
@@ -21,9 +23,8 @@ def create_app():
     mongo.init_app(app)
 
     logging.basicConfig(level=logging.DEBUG, filename='app.log', format='%(asctime)s %(message)s')
-    global LOGGER
-    LOGGER = logging.getLogger()
-    LOGGER.info("App has been created")
+    logger = logging.getLogger()
+    logger.info("App has been created")
 
     return app
 
