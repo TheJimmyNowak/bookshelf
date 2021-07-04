@@ -1,4 +1,6 @@
+import logging
 from flask import Flask
+from flask_cors import CORS
 from flask_pymongo import PyMongo
 
 import config
@@ -8,6 +10,7 @@ mongo = PyMongo()
 
 def create_app():
     app = Flask(__name__)  # pylint: disable=redefined-outer-name
+    CORS(app)
 
     app.config.from_object(config)
 
@@ -18,6 +21,10 @@ def create_app():
     app.register_blueprint(auth)
 
     mongo.init_app(app)
+
+    logging.basicConfig(level=logging.DEBUG, filename='app.log', format='%(asctime)s %(message)s')
+    logger = logging.getLogger()
+    logger.info("App has been created")
 
     return app
 

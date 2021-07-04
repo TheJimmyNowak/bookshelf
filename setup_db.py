@@ -1,19 +1,22 @@
 import json
 import pymongo
+import logging
 
-print("Reading secrets")
+LOGGER = logging.getLogger()
+
+LOGGER.info("Reading secrets")
 with open("secret.json") as secrets:
     secrets = json.load(secrets)
 
-print("Connecting with DB")
+LOGGER.info("Connecting with DB")
 client = pymongo.MongoClient(secrets['connection-string'])
 db = client.bookshelf
 
-print("Creating collections")
+LOGGER.info("Creating collections")
 db.create_collection("books")
 db.create_collection("users")
 
-print("Creating indexes")
+LOGGER.info("Creating indexes")
 db.books.create_index([("location", pymongo.GEOSPHERE)])
 
-print("DB setted up")
+LOGGER.info("DB setted up")
