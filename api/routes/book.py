@@ -1,5 +1,7 @@
 import json
 import logging
+import re
+
 from bson.json_util import dumps, ObjectId
 from flask import Blueprint, jsonify, Response, request
 
@@ -10,6 +12,7 @@ from api.util.json_encoder import JSONEncoder
 book = Blueprint('book', __name__)
 LOGGER = logging.getLogger()
 
+
 @book.route('/api/book/<book_id>', methods=['GET'])
 def get_book_id(book_id: str) -> Response:
     result = mongo.db.books.find_one({"_id": ObjectId(book_id)})
@@ -18,7 +21,22 @@ def get_book_id(book_id: str) -> Response:
     return jsonify(result)
 
 
-@book.route('/api/book/<float:longitude>/<float:latitude>/<float:max_distance>')
+@book.route('/api/book/filter', methods=['GET'])
+def get_book_by_filter() -> Response:
+    name = request.args.get('name') if request.args.get('name') else ""
+    author = request.args.get('author') if request.args.get('author') else ""
+
+    name_regex = re.compile(".*" + name + ".*", re.IGNORECASE)
+    author_regex = re.compile(".*" + author + ".*", re.IGNORECASE)
+    result = list(mongo.db.books.find({
+        'name': name_regex,
+        'author': author_regex
+    }))
+    result = json.loads(JSONEncoder().encode(result))
+    return jsonify(result)
+
+
+@book.route('/api/book/<float:longitude>/<float:latitude>/<float:max_distance>', methods=['GET'])
 def get_book_by_localization(longitude: float, latitude: float, max_distance: float) -> Response:
     is_longitude_correct = -180 < longitude < 180
     is_latitude_correct = -90 < latitude < 90
@@ -56,3 +74,9 @@ def add_book() -> Response:
         return Response(status=201)
 
     return Response(status=400)
+
+
+@book.route('/api/book/<book_id>', methods=['DELETE'])
+@token_required
+def remove_book_by_id(book_id: str) -> Response:
+    pass
