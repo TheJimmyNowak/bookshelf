@@ -49,6 +49,22 @@ class Test(TestCase):
         result = self.test_app.get('/api/book/190.1/42.0/10.0')
         self.assertEqual(result.status_code, 400)
 
+    def test_get_book_by_filter(self, mongo_mock):
+        mongo_mock.db.books.find.return_value = [
+            {
+                'name': 'Das Kapital',
+                'author': 'Karl Marx',
+            },
+            {
+                'name': 'Das Zukunft',
+                'author': 'Adrian ABD'
+            }
+        ]
+
+        result = self.test_app.get('/api/book/filter?name=das')
+        self.assertEqual(result.status_code, 200)
+        self.assertTrue(mongo_mock.db.books.find.called)
+
     @patch('api.util.jwt_token.jwt.decode')
     def test_add_book(self, mongo_mock, decode_mock):
         public_id = '1ea4d7c6-ab97-41fe-bca4-f144002fbe6a'
@@ -83,5 +99,4 @@ class Test(TestCase):
                                     content_type='application/json',
                                     headers={'X-Access-Token': token})
 
-        self.assertTrue(mongo_mock)
         self.assertEqual(result.status_code, 201)
