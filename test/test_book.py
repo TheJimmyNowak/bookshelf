@@ -66,9 +66,11 @@ class Test(TestCase):
         self.assertTrue(mongo_mock.db.books.find.called)
 
     @patch('api.util.jwt_token.jwt.decode')
-    def test_add_book(self, mongo_mock, decode_mock):
+    @patch('api.util.jwt_token.mongo')
+    def test_add_book(self,  auth_mongo_mock,decode_mock, mongo_mock):
         public_id = '1ea4d7c6-ab97-41fe-bca4-f144002fbe6a'
         mongo_mock.db.books.find_one({'public_id': public_id})
+        auth_mongo_mock.db.users.find_one.return_value = "a"
         decoded_token = {
             'public_id': public_id,
             'exp': 1625231310
