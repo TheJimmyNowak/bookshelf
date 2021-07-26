@@ -1,11 +1,13 @@
+import logging
 from datetime import datetime, timedelta
 from functools import wraps
 from typing import Callable
-import traceback
 
 import jwt
 from flask import request, jsonify
 from app import mongo
+
+LOGGER = logging.getLogger()
 
 
 def generate_jwt_token(public_id: str, jwt_key: str, expiration_time=30):
@@ -13,6 +15,7 @@ def generate_jwt_token(public_id: str, jwt_key: str, expiration_time=30):
         'public_id': public_id,
         'exp': datetime.utcnow() + timedelta(minutes=expiration_time)
     }, jwt_key)
+
     return token
 
 
@@ -32,13 +35,12 @@ def token_required(func: Callable) -> Callable:
 
         try:
             data = jwt.decode(token, app.config['JWT_KEY'], algorithms="HS256")
-            mongo.db.users.find_one({'public_id': data['public_id']})
+            user = mongo.db.users.find_one({'public_id': data['public_id']})
         except Exception as e:
             print(e)
             return jsonify({
                 'message': 'Token is invalid !!'
             }), 401
-
-        return func(*args, **kwargs)
+        return func(*args, **kwargs, user=user)
 
     return decorated

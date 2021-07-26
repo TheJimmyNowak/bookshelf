@@ -1,4 +1,6 @@
 import logging
+import sys
+
 from flask import Flask
 from flask_cors import CORS
 from flask_pymongo import PyMongo
@@ -22,9 +24,8 @@ def create_app():
 
     mongo.init_app(app)
 
-    logging.basicConfig(level=logging.DEBUG, filename='app.log', format='%(asctime)s %(message)s')
+    logging.basicConfig(level=logging.DEBUG, filename="app.log", format='%(asctime)s %(message)s')
     logger = logging.getLogger()
-    logger.info("App has been created")
 
     return app
 
