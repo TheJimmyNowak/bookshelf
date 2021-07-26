@@ -1,7 +1,9 @@
 import json
 import logging
 import re
+import traceback
 
+import bson.errors
 from bson.json_util import dumps, ObjectId
 from flask import Blueprint, jsonify, Response, request
 
@@ -17,7 +19,7 @@ LOGGER = logging.getLogger()
 def get_book_id(book_id: str) -> Response:
     result = mongo.db.books.find_one({"_id": ObjectId(book_id)})
     result = json.loads(JSONEncoder().encode(result))
-    LOGGER.info("get_book_id called, returning:\n {}".format(result))
+    LOGGER.info("get_book_id called, returning: {}".format(result))
     return jsonify(result)
 
 
@@ -29,7 +31,7 @@ def get_book_by_filter() -> Response:
     name_regex = re.compile(".*" + name + ".*", re.IGNORECASE)
     author_regex = re.compile(".*" + author + ".*", re.IGNORECASE)
     result = list(mongo.db.books.find({
-        'name': name_regex,
+        'title': name_regex,
         'author': author_regex
     }))
     result = json.loads(JSONEncoder().encode(result))
@@ -56,21 +58,21 @@ def get_book_by_localization(longitude: float, latitude: float, max_distance: fl
 
     result = dumps(result)
     result = json.loads(result)
-    LOGGER.info("get_book_by_localization called, returning:\n {}".format(result))
     return jsonify(result)
 
 
 @book.route('/api/book', methods=["POST"])
 @token_required
-def add_book() -> Response:
+def add_book(user) -> Response:
     content = request.json
 
     is_required_data_passed: bool = \
-        content is not None and "name" in content and "author" in content
+        content is not None and "title" in content and "author" in content
 
     if is_required_data_passed:
+        content['owner'] = ObjectId(user['_id'])
         mongo.db.books.insert_one(content)
-        LOGGER.info("add_book called, {} was added".format(content))
+        LOGGER.info("add_book called, {} was added".format(content['title']))
         return Response(status=201)
 
     return Response(status=400)
@@ -78,5 +80,16 @@ def add_book() -> Response:
 
 @book.route('/api/book/<book_id>', methods=['DELETE'])
 @token_required
-def remove_book_by_id(book_id: str) -> Response:
-    pass
+def remove_book_by_id(book_id: str, user) -> Response:
+    try:
+        owner_id = mongo.db.books.find_one({"_id": ObjectId(book_id)},
+                                           {"owner": 1, "_id": 0})['owner']
+        if ObjectId(owner_id) == user['_id']:
+            mongo.db.books.delete_one({"_id": ObjectId(book_id)})
+            LOGGER.info("Book {} has been deleted".format(book_id))
+            return Response(status=200)
+
+    except bson.errors.InvalidId:
+        LOGGER.exception(traceback.format_exc())
+
+    return Response(status=400)

@@ -2,6 +2,8 @@ import json
 from unittest import TestCase
 from unittest.mock import patch
 
+from bson import ObjectId
+
 from api.util.jwt_token import generate_jwt_token
 from app import create_app
 
@@ -66,22 +68,25 @@ class Test(TestCase):
         self.assertTrue(mongo_mock.db.books.find.called)
 
     @patch('api.util.jwt_token.jwt.decode')
-    def test_add_book(self, mongo_mock, decode_mock):
+    @patch('api.util.jwt_token.mongo')
+    def test_add_book(self,  auth_mongo_mock,decode_mock, mongo_mock):
         public_id = '1ea4d7c6-ab97-41fe-bca4-f144002fbe6a'
-        mongo_mock.db.books.find_one({'public_id': public_id})
+        auth_mongo_mock.db.users.find_one.return_value = {"_id": "60ddb307ee58b79d669a7a84"}
         decoded_token = {
             'public_id': public_id,
-            'exp': 1625231310
+            'exp': 1625231339
         }
         decode_mock.return_value = decoded_token
+        token = generate_jwt_token(public_id, "sfafd")
+
         result = self.test_app.post('/api/book')
 
         self.assertEqual(result.status_code, 401)
 
         content = {
-            "name": "TestName"
+            "title": "TestName"
         }
-        token = generate_jwt_token(public_id, "sfafd")
+        mongo_mock.db.books.insert_one({'public_id': public_id}).return_value = "a"
         result = self.test_app.post('/api/book',
                                     data=json.dumps(content),
                                     content_type='application/json',
@@ -100,3 +105,23 @@ class Test(TestCase):
                                     headers={'X-Access-Token': token})
 
         self.assertEqual(result.status_code, 201)
+
+    @patch('api.util.jwt_token.jwt.decode')
+    @patch('api.util.jwt_token.mongo')
+    def test_remove_book_by_id(self, auth_mongo_mock,decode_mock, mongo_mock):
+        public_id = '1ea4d7c6-ab97-41fe-bca4-f144002fbe6a'
+        auth_mongo_mock.db.users.find_one.return_value = {"_id": ObjectId("60ddb307ee58b79d669a7a84")}
+        decoded_token = {
+            'public_id': public_id,
+            'exp': 1625231339
+        }
+        decode_mock.return_value = decoded_token
+        token = generate_jwt_token(public_id, "sfafd")
+
+        mongo_mock.db.books.find_one.return_value = {"owner": "60ddb307ee58b79d669a7a84"}
+        result = self.test_app.delete('/api/book/aaa', headers={'X-Access-Token': token})
+        self.assertEqual(result.status_code, 400)
+
+        mongo_mock.db.delete_one.return_value = "adf"
+        result = self.test_app.delete('/api/book/60fd9fde1c3fd54e3adad3dd', headers={'X-Access-Token': token})
+        self.assertEqual(result.status_code, 200)
