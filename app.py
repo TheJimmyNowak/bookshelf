@@ -18,14 +18,14 @@ def create_app():
 
     from api.routes.book import book  # pylint: disable=import-outside-toplevel,cyclic-import
     from api.routes.auth import auth  # pylint: disable=import-outside-toplevel
+    from api.routes.user import user  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(book)
     app.register_blueprint(auth)
-
+    app.register_blueprint(user)
     mongo.init_app(app)
 
     logging.basicConfig(level=logging.DEBUG, filename="app.log", format='%(asctime)s %(message)s')
-    logger = logging.getLogger()
 
     return app
 
