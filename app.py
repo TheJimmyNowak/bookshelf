@@ -16,9 +16,11 @@ def create_app():
 
     from api.routes.book import book  # pylint: disable=import-outside-toplevel,cyclic-import
     from api.routes.auth import auth  # pylint: disable=import-outside-toplevel
+    from api.routes.chat import chat  # pylint: disable=import-outside-toplevel
 
     app.register_blueprint(book)
     app.register_blueprint(auth)
+    app.register_blueprint(chat)
 
     mongo.init_app(app)
 
