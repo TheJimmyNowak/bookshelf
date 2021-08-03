@@ -10,6 +10,7 @@ from api.util.json_encoder import JSONEncoder
 book = Blueprint('book', __name__)
 logger = logging.getLogger()
 
+
 @book.route('/api/book/<book_id>', methods=['GET'])
 def get_book_id(book_id: str) -> Response:
     result = mongo.db.books.find_one({"_id": ObjectId(book_id)})
